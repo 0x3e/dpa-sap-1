@@ -1,0 +1,13 @@
+{
+  "include": ["src/types.ts","src/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "target": "es2015",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "target": "es5",
+    "outDir": "dist",
+    "sourceMap": true
+  }
+}
