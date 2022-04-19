@@ -6,13 +6,6 @@ export interface TwoInput {
   output (): boolean;
 }
 
-export interface ThreeState {
-  a: boolean;
-  b: boolean;
-  input ( a:boolean, b:boolean ): boolean;
-  output (): boolean | undefined;
-}
-
 export class AND implements TwoInput {
   input0: boolean;
   input1: boolean;

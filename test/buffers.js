@@ -22,3 +22,14 @@ tap.test(                   'NOT  | input | output |', t => {
                            ,'.    |"Kevin"|  E NaB |')
   t.end()
 })
+
+tap.test(                   'TriState |   a   |   b   | output |', t => {
+  var tristate = new buffer.TriState()
+  t.equal(typeof(tristate.output()), 'boolean',
+                                         '.   | (0,1) | (0,1) | (0,1,~)|')
+  t.notOk(tristate.input(false, false),  '.   |   0   |   0   |    ~   |')
+  t.notOk(tristate.input(true, false),   '.   |   1   |   0   |    ~   |')
+  t.notOk(tristate.input(false, true),   '.   |   0   |   1   |    0   |')
+  t.ok(tristate.input(true, true),       '.   |   1   |   1   |    1   |')
+  t.end()
+})
