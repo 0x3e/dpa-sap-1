@@ -23,13 +23,22 @@ tap.test(                   'NOT  | input | output |', t => {
   t.end()
 })
 
-tap.test(                   'TriState |   a   |   b   | output |', t => {
+tap.test(                              'TriState |   a   |   b   | output |', t => {
   var tristate = new buffer.TriState()
-  t.equal(typeof(tristate.output()), 'boolean',
-                                         '.   | (0,1) | (0,1) | (0,1,~)|')
-  t.notOk(tristate.input(false, false),  '.   |   0   |   0   |    ~   |')
-  t.notOk(tristate.input(true, false),   '.   |   1   |   0   |    ~   |')
-  t.notOk(tristate.input(false, true),   '.   |   0   |   1   |    0   |')
-  t.ok(tristate.input(true, true),       '.   |   1   |   1   |    1   |')
+  type_of_tristate = typeof(tristate.output())
+  if(type_of_tristate === 'boolean')
+    t.equal(typeof(tristate.output()), 'boolean',
+                                       '.        | (0,1) | (0,1) | (0,1,~)|')
+  else
+    t.equal(typeof(tristate.output()), 'undefined',
+                                       '.        | (0,1) | (0,1) | (0,1,~)|')
+  t.equal(typeof(tristate.input(false, false)), 'undefined',
+                                       '.        |   0   |   0   |    ~   |')
+  t.equal(typeof(tristate.input(true, false)), 'undefined',
+                                       '.        |   1   |   0   |    ~   |')
+  t.notOk(tristate.input(false, true), '.        |   0   |   1   |    0   |')
+  t.ok(tristate.input(true, true),     '.        |   1   |   1   |    1   |')
+  t.throws(function(){tristate.input('Kevin', false)},{ message: 'NaB' }
+                                      ,'.        | "Emma"|   0   |  E NaB |')
   t.end()
 })

@@ -1,58 +1,84 @@
+/*                                                                            *\
+*                                                                              *
+*                                                                              *
+\*                                                                            */
 export interface OneInput {
-  inputted: boolean;
+  i: boolean;
+  o: boolean;
   input ( i:boolean ): boolean;
+  processing (): void;
   output (): boolean;
 }
 
 export interface ThreeState {
   a: boolean;
   b: boolean;
+  o: boolean | undefined;
   input ( a:boolean, b:boolean ): boolean | undefined;
+  processing (): void;
   output (): boolean | undefined;
 }
 
 export function random_bit(){
   return Math.floor(Math.random() * 2) === 0
 }
+export function throw_on_NaB(...args: boolean[]){
+  for (const arg of Array.from(args))
+    if(typeof(arg) !== 'boolean')
+      throw new Error('NaB');
+}
 
 export class Buffer implements OneInput {
-  inputted: boolean;
+  i: boolean;
+  o: boolean;
   constructor() {
-    this.inputted = random_bit();
-  } 
-  input(i: boolean) { 
-    if(typeof(i) !== 'boolean')
-      throw new Error('NaB')
-    this.inputted = i;
+    this.i = random_bit();
+    this.o = random_bit();
+  }
+  input(i: boolean) {
+    throw_on_NaB(i);
+    this.i = i;
+    this.processing();
     return this.output();
   }
+  processing() {
+    this.o = this.i;
+  }
   output() {
-    return this.inputted;
+    return this.o;
   }
 }
 
 export class NOT extends Buffer implements OneInput {
-  output(){
-    return !this.inputted;
+  processing(){
+    this.o = !this.i;
   }
 }
 
 export class TriState implements ThreeState {
   a: boolean;
   b: boolean;
+  o: boolean | undefined;
   constructor() {
     this.a = random_bit();
     this.b = random_bit();
-  } 
-  input(a: boolean, b: boolean) { 
+    this.processing();
+  }
+  input(a: boolean, b: boolean) {
+    throw_on_NaB(a,b);
     this.a = a;
     this.b = b;
+    this.processing();
+
     return this.output();
   }
-  output(){
+  processing(){
     if(this.b)
-      return this.a;
+      this.o = this.a;
     else
-      return undefined;
+      this.o = undefined;
+  }
+  output(){
+    return this.o;
   }
 }

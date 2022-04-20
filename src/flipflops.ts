@@ -1,88 +1,104 @@
 import * as buffer from './buffers'
 import * as gate from './gates'
-export interface TwoInputTwoOutput {
-  input0: boolean;
-  input1: boolean;
-  input ( i:boolean, j:boolean ): number;
-  output (): number; // two bit number first bit Q second !Q
-}
-
-export class SRLatch implements TwoInputTwoOutput {
-  nor0: gate.NOR;
-  nor1: gate.NOR;
-  input0: boolean;
-  input1: boolean;
+export interface ISRLatch {
   s: boolean;
   r: boolean;
+  o0: boolean;
+  o1: boolean;
+  input ( s:boolean, r:boolean ): number;
+  processing (): void;
+  output (): number; // two bit number smallest bit Q second !Q
+}
+
+export interface IDLatch {
+  e: boolean;
+  d: boolean;
+  o0: boolean;
+  o1: boolean;
+  input ( e:boolean, d:boolean ): number;
+  processing (): void;
+  output (): number; // two bit number smallest bit Q second !Q
+}
+
+export class SRLatch implements ISRLatch {
+  s: boolean;
+  r: boolean;
+  nor0: gate.NOR;
+  nor1: gate.NOR;
+  o0: boolean;
+  o1: boolean;
   constructor() {
+    this.s = buffer.random_bit();
+    this.r = buffer.random_bit();
     this.nor0 = new gate.NOR();
     this.nor1 = new gate.NOR();
-    this.s = buffer.random_bit();
-    this.input0 = this.s
-    this.r = buffer.random_bit();
-    this.input1 = this.r
+    this.o0 = buffer.random_bit();
+    this.o1 = buffer.random_bit();
+    this.processing()
     this.output()
   }
-  input(s: boolean, r: boolean) { 
-    if(typeof(s) !== 'boolean' || typeof(r) !== 'boolean')
-      throw new Error('NaB')
-    this.s = s;
-    this.input0 = s
-    this.r = r;
-    this.input1 = r
+  input(s: boolean, r: boolean) {
+    buffer.throw_on_NaB(s, r);
+    this.s = s
+    this.r = r
+    this.processing()
     return this.output();
   }
+  processing(){
+    this.o0 = this.nor0.input(this.r, this.nor1.output())
+    this.o1 = this.nor1.input(this.o0, this.s)
+    this.o0 = this.nor0.input(this.r, this.nor1.output())
+    this.o0 = this.nor0.output()
+    this.o1 = this.nor1.output()
+  }
   output(){
-    let nor0_out = this.nor0.input(this.r, this.nor1.output())
-    let nor1_out = this.nor1.input(nor0_out, this.s)
-    nor0_out = this.nor0.input(this.r, this.nor1.output())
-    nor0_out = this.nor0.output()
-    nor1_out = this.nor1.output()
-    let return_val = 0
-    if(nor0_out)
-      return_val = return_val + 1
-    if(nor1_out)
-      return_val = return_val + 2
-    return return_val
+    let out = 0;
+    if(this.o0)
+      out = out + 0b01;
+    if(this.o1)
+      out = out + 0b10;
+    return out;
   }
 }
 
-export class DLatch implements TwoInputTwoOutput {
-  sr_latch: SRLatch;
+export class DLatch implements IDLatch {
+  e: boolean;
+  d: boolean;
   not: buffer.NOT
   and0: gate.AND;
   and1: gate.AND;
-  input0: boolean;
-  input1: boolean;
-  d: boolean;
-  e: boolean;
+  sr_latch: SRLatch;
+  o0: boolean;
+  o1: boolean;
   constructor() {
-    this.sr_latch = new SRLatch();
+    this.e = buffer.random_bit();
+    this.d = buffer.random_bit();
     this.not = new buffer.NOT()
     this.and0 = new gate.AND()
     this.and1 = new gate.AND()
-    this.e = buffer.random_bit();
-    this.input0 = this.e
-    this.d = buffer.random_bit();
-    this.input1 = this.d
-    this.output()
+    this.sr_latch = new SRLatch();
+    this.o0 = buffer.random_bit();
+    this.o1 = buffer.random_bit();
+    this.processing();
+    this.output();
   }
-  input(e: boolean, d: boolean) { 
-    if(typeof(d) !== 'boolean' || typeof(e) !== 'boolean')
-      throw new Error('NaB')
+  input(e: boolean, d: boolean) {
+    buffer.throw_on_NaB(e, d);
     this.e = e;
-    this.input0 = e
     this.d = d;
-    this.input1 = d
+    this.processing();
 
     return this.output();
   }
-  output(){
+  processing(){
     const step1 = this.not.input(this.d)
     const step2 = this.and0.input(step1,this.e)
     const step3 = this.and0.input(this.e,this.d)
-    const return_val = this.sr_latch.input(step3,step2)
-
-    return return_val
+    const step4 = this.sr_latch.input(step3,step2)
+    this.o0 = ((step4 >> 0) % 2) == 1;
+    this.o1 = ((step4 >> 1) % 2 ) == 1;
+  }
+  output(){
+    return this.sr_latch.output();
   }
 }

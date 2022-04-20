@@ -1,6 +1,7 @@
 {
-  "include": ["src/types.ts","src/*.ts"],
+  "include": ["src/*.ts"],
   "exclude": ["node_modules"],
+  "exclude": ["src/nothing.ts"],
   "compilerOptions": {
     "target": "es2015",
     "esModuleInterop": true,

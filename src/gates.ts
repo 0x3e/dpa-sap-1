@@ -1,33 +1,41 @@
 import * as buffer from './buffers'
 export interface TwoInput {
-  input0: boolean;
-  input1: boolean;
+  i0: boolean;
+  i1: boolean;
+  o: boolean;
   input ( i:boolean, j:boolean ): boolean;
+  processing (): void;
   output (): boolean;
 }
 
 export class AND implements TwoInput {
-  input0: boolean;
-  input1: boolean;
+  i0: boolean;
+  i1: boolean;
+  o: boolean;
   constructor() {
-    this.input0 = buffer.random_bit();
-    this.input1 = buffer.random_bit();
-  } 
-  input(input0: boolean, input1: boolean) { 
-    if(typeof(input0) !== 'boolean' || typeof(input1) !== 'boolean')
-      throw new Error('NaB')
-    this.input0 = input0;
-    this.input1 = input1;
+    this.i0 = buffer.random_bit();
+    this.i1 = buffer.random_bit();
+    this.o  = buffer.random_bit();
+  }
+  input(i0: boolean, i1: boolean) {
+    buffer.throw_on_NaB(i0, i1);
+    this.i0 = i0;
+    this.i1 = i1;
+    this.processing();
+
     return this.output();
   }
+  processing() {
+    this.o = this.i0 && this.i1;
+  }
   output() {
-    return this.input0 && this.input1;
+    return this.o;
   }
 }
 
 export class OR extends AND implements TwoInput {
-  output(){
-    return this.input0 || this.input1;
+  processing(){
+    this.o = this.i0 || this.i1;
   }
 }
 
@@ -37,31 +45,35 @@ export class NAND extends AND implements TwoInput {
     super();
     this.not = new buffer.NOT();
   }
-  output(){
-    return this.not.input(super.output());
+  processing(){
+    super.processing()
+    this.o = this.not.input(super.output());
   }
 }
 
 export class NOR extends OR implements TwoInput {
   not: buffer.NOT;
-  /* istanbul ignore next */
+
+/* istanbul ignore next */
   constructor() {
     super();
     this.not = new buffer.NOT();
   }
-  output(){
-    return this.not.input(super.output());
+
+  processing(){
+    super.processing()
+    this.o = this.not.input(super.output());
   }
 }
 
 export class XOR extends OR implements TwoInput {
-  output(){
-    return this.input0 != this.input1;
+  processing(){
+    this.o = this.i0 != this.i1;
   }
 }
 
 export class XNOR extends OR implements TwoInput {
-  output(){
-    return this.input0 === this.input1;
+  processing(){
+    this.o = this.i0 === this.i1;
   }
 }
