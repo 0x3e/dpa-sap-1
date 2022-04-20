@@ -31,3 +31,8 @@ tap.test('Register  | l | d | c | e | Out |', t => {
 //         '.         | 1 | 0 | 1 | 0 |  ~  |')
   t.end();
 })
+tap.test('EightBitRegister  | 8 | d | c | e | Out |', t => {
+  var r8 = new register.EightBitRegister()
+  t.fail('not even a start');
+  t.end();
+})

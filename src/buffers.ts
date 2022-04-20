@@ -20,7 +20,7 @@ export interface ThreeState {
 }
 
 export function random_bit(){
-  return Math.floor(Math.random() * 2) === 0
+  return Math.floor(Math.random() * 2) === 0;
 }
 export function throw_on_NaB(...args: boolean[]){
   for (const arg of Array.from(args))

@@ -1,4 +1,4 @@
-import * as buffer from './buffers'
+import * as buffer from './buffers';
 export interface TwoInput {
   i0: boolean;
   i1: boolean;
@@ -54,6 +54,7 @@ export class NAND extends AND implements TwoInput {
 export class NOR extends OR implements TwoInput {
   not: buffer.NOT;
 
+/* why istanbul? why is this not tested? is this a bug? */
 /* istanbul ignore next */
   constructor() {
     super();
