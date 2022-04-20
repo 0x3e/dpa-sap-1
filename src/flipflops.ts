@@ -91,10 +91,10 @@ export class DLatch implements IDLatch {
     return this.output();
   }
   processing(){
-    const step1 = this.not.input(this.d)
-    const step2 = this.and0.input(step1,this.e)
-    const step3 = this.and0.input(this.e,this.d)
-    const step4 = this.sr_latch.input(step3,step2)
+    const step1 = this.not.input(this.d);
+    const step2 = this.and0.input(step1, this.e);
+    const step3 = this.and1.input(this.e, this.d);
+    const step4 = this.sr_latch.input(step3,step2);
     this.o0 = ((step4 >> 0) % 2) == 1;
     this.o1 = ((step4 >> 1) % 2 ) == 1;
   }

@@ -46,7 +46,7 @@ export class NAND extends AND implements TwoInput {
     this.not = new buffer.NOT();
   }
   processing(){
-    super.processing()
+    super.processing();
     this.o = this.not.input(super.output());
   }
 }
@@ -62,7 +62,7 @@ export class NOR extends OR implements TwoInput {
   }
 
   processing(){
-    super.processing()
+    super.processing();
     this.o = this.not.input(super.output());
   }
 }
