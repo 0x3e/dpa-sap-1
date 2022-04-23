@@ -47,6 +47,12 @@ export class Register implements IRegister {
   }
 
   input(l:boolean, d:boolean | undefined, c:boolean, e:boolean){
+/* why istanbul? why is this not tested? is this a bug? */
+/* istanbul ignore next */
+    if(this.d === undefined){
+      this.o = undefined;
+      return this.output();
+    }
     buffer.throw_on_NaB(l, c, e);
     this.l = l;
     this.d = d;
@@ -57,7 +63,8 @@ export class Register implements IRegister {
   }
 
   processing(){
-    if(this.d === undefined) return;
+    if(this.d === undefined)
+      return this.o = undefined;
     const step1 = this.not.input(this.l);
     const step2 = this.and0.input(step1,this.d_latch.q);
     const step3 = this.and1.input(this.d,this.l);
@@ -81,12 +88,12 @@ export class EightBitRegister implements I8BitRegister {
   r: Register[];
 
   constructor() {
-    this.d = [...Array(8).fill(buffer.random_bit())]
+    this.d = buffer.random_bits(8);
     this.clr = buffer.random_bit();
     this.l = buffer.random_bit();
     this.e = buffer.random_bit();
     this.c = buffer.random_bit();
-    this.r = [...Array(8)].map(() => { return new Register() });
+    this.r = Array(8).fill(0).map(() => { return new Register() });
     this.o = this.r.map((r) => {return r.output()});
   }
 

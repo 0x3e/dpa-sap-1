@@ -22,6 +22,20 @@ export interface ThreeState {
 export function random_bit(){
   return Math.floor(Math.random() * 2) === 0;
 }
+
+export function random_bits(i: number){
+  return new Array(i).fill(undefined).map(() => {
+    return random_bit()})
+}
+
+export function bits_to_num(bits: boolean[]){
+  let out = 0
+  for (const i in bits)
+    out = out + (( bits[bits.length - +i - 1] ? 1 : 0) << +i ) // endian
+
+  return out;
+}
+
 export function throw_on_NaB(...args: boolean[]){
   for (const arg of Array.from(args))
     if(typeof(arg) !== 'boolean')

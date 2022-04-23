@@ -52,11 +52,7 @@ export class SRLatch implements ISRLatch {
     this.not_q = this.nor1.output();
   }
   output(){
-    let out = 0;
-    if(this.q)
-      out = out + 0b01;
-    if(this.not_q)
-      out = out + 0b10;
+    const out = buffer.bits_to_num([this.not_q,this.q]);
     return out;
   }
 }

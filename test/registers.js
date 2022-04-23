@@ -28,6 +28,8 @@ tap.test('Register  | l | d | c | e | Out |', t => {
          '.        | 0 | 0 | 0 | 1 |  0  |')
   t.equal(r.input(false, false, false, true), false,
          '.        | 0 | 0 | 0 | 1 |  0  |')
+  t.equal(typeof(r.input(true, undefined, true, false)), 'undefined',
+         '.        | 0 | Z | 0 | 1 |  Z  |')
 //         '.         | 1 | 0 | 1 | 0 |  Z  |')
   t.end();
 })
