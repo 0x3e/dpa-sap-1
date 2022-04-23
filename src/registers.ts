@@ -1,52 +1,53 @@
 import * as buffer from './buffers';
 import * as gate from './gates';
 import * as flipflop from './flipflops';
+
 export interface IRegister {
   l: boolean;
-  d: boolean;
+  d: boolean | undefined;
   c: boolean;
   e: boolean;
   o: boolean | undefined;
-  input (l:boolean, d:boolean, c:boolean, e:boolean): boolean | undefined;
+  input (l:boolean, d:boolean | undefined, c:boolean, e:boolean): boolean | undefined;
   output (): boolean | undefined;
 }
 
 export interface I8BitRegister {
-  d: boolean[];
-  o: boolean[];
-  input ( d:boolean[], clr:boolean, l:boolean, e:boolean, c:boolean ): boolean[] | undefined;
-  output (): boolean[] | undefined[];
+  d: (boolean | undefined)[];
+  o: (boolean | undefined)[];
+  input ( l:boolean, d:(boolean | undefined)[], c:boolean, e:boolean, clr:boolean ): (boolean | undefined)[];
+  output (): (boolean | undefined)[];
 }
 
 export class Register implements IRegister {
+  l: boolean;
+  d: boolean | undefined;
+  c: boolean;
+  e: boolean;
+  o: boolean | undefined;
   not: buffer.NOT;
   and0: gate.AND;
   and1: gate.AND;
   or: gate.OR;
   d_latch: flipflop.DLatch;
-  l: boolean;
-  d: boolean;
-  c: boolean;
-  e: boolean;
-  o: boolean | undefined;
   tristate: buffer.TriState;
 
   constructor() {
+    this.l = buffer.random_bit();
+    this.d = buffer.random_bit();
+    this.c = buffer.random_bit();
+    this.e = buffer.random_bit();
+    this.o = buffer.random_bit();
     this.not = new buffer.NOT();
     this.and0 = new gate.AND();
     this.and1 = new gate.AND();
     this.or = new gate.OR();
     this.d_latch = new flipflop.DLatch();
-    this.l = buffer.random_bit();
-    this.d = buffer.random_bit();
-    this.c = buffer.random_bit();
-    this.e = buffer.random_bit();
-    this.o  = undefined;
     this.tristate = new buffer.TriState();
   }
 
-  input(l:boolean, d:boolean, c:boolean, e:boolean){
-    buffer.throw_on_NaB(l, d, c);
+  input(l:boolean, d:boolean | undefined, c:boolean, e:boolean){
+    buffer.throw_on_NaB(l, c, e);
     this.l = l;
     this.d = d;
     this.c = c;
@@ -56,12 +57,13 @@ export class Register implements IRegister {
   }
 
   processing(){
+    if(this.d === undefined) return;
     const step1 = this.not.input(this.l);
-    const step2 = this.and0.input(step1,this.d_latch.o0);
+    const step2 = this.and0.input(step1,this.d_latch.q);
     const step3 = this.and1.input(this.d,this.l);
     const step4 = this.or.input(step2,step3);
     this.d_latch.input(this.c,step4);
-    this.o = this.tristate.input(this.d_latch.o0,this.e);
+    this.o = this.tristate.input(this.d_latch.q,this.e);
   }
 
   output(){
@@ -70,25 +72,25 @@ export class Register implements IRegister {
 }
 
 export class EightBitRegister implements I8BitRegister {
-  d: boolean[];
+  d: (boolean | undefined)[];
   clr: boolean;
   l: boolean;
   e: boolean;
   c: boolean;
+  o: (boolean | undefined)[];
   r: Register[];
-  o: boolean[];
 
   constructor() {
-    this.d = [false];
+    this.d = [...Array(8).fill(buffer.random_bit())]
     this.clr = buffer.random_bit();
     this.l = buffer.random_bit();
     this.e = buffer.random_bit();
     this.c = buffer.random_bit();
     this.r = [...Array(8)].map(() => { return new Register() });
-    this.o = [false];
-
+    this.o = this.r.map((r) => {return r.output()});
   }
-  input(d:boolean[], clr:boolean, l:boolean, e:boolean, c:boolean){
+
+  input(l:boolean, d:(boolean | undefined)[], c:boolean, e:boolean, clr:boolean ){
     this.d = d;
     this.clr = clr;
     this.l = l;
@@ -98,9 +100,16 @@ export class EightBitRegister implements I8BitRegister {
     this.processing();
     return this.output();
   }
+
   processing(){
-    this.o = [false];
+    for (const i in this.r)
+      this.r[i].input(this.l, this.d[i], this.c, this.e)
+    if(this.clr)
+      for (const r of this.r)
+        r.input(true, false, true, false)
+    this.o = this.r.map((r) => {return r.output()});
   }
+
   output(){
     return this.o;
   }

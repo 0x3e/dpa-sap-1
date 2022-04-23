@@ -5,7 +5,7 @@
 export interface OneInput {
   i: boolean;
   o: boolean;
-  input ( i:boolean ): boolean;
+  input ( i:boolean ): void;
   processing (): void;
   output (): boolean;
 }
@@ -14,7 +14,7 @@ export interface ThreeState {
   a: boolean;
   b: boolean;
   o: boolean | undefined;
-  input ( a:boolean, b:boolean ): boolean | undefined;
+  input ( a:boolean, b:boolean ): void;
   processing (): void;
   output (): boolean | undefined;
 }
