@@ -59,3 +59,34 @@ tap.test('FourBitAdder |  a | b  | c |  co |  s  |', t => {
           '.           | xE | xF | 1 |  1  | 0xD |')
   t.end()
 })
+tap.test('EightBitAdder |  a  |  b  | c |  co |  s   |', t => {
+  var eight_bit_adder = new adder.EightBitAdder()
+  xZZ = new Array(8).fill(undefined);
+  x00 = new Array(8).fill(false);
+  xFF = new Array(8).fill(true);
+  x0F = new Array(4).fill(false).concat(new Array(4).fill(true));
+  const first_run = eight_bit_adder.output()
+  t.equal(typeof(first_run), 'number',
+         '.             |  ?? |  ?? | ? | 0,1 | 0,1  |')
+  t.throws(function(){eight_bit_adder.input(x00,xZZ,false)},{ message: 'NaB' },
+         '.             | x00 | xZZ | 0 | NaB | NaB  |')
+  t.throws(function(){eight_bit_adder.input( xZZ, x00, true)},{ message: 'NaB' },
+         '.             | xZZ | x00 | 1 | NaB | NaB  |')
+  t.equal(eight_bit_adder.input(x00, xFF, false), 0xFF,
+         '.             | x00 | xFF | 0 |  0  | 0xFF |')
+  t.equal(eight_bit_adder.input(xFF, x00, false), 0xFF,
+         '.             | xFF | x00 | 0 |  0  | 0xFF |')
+  t.equal(eight_bit_adder.input(xFF, xFF, false), 0x1FE,
+         '.             | xFF | xFF | 0 |  1  | 0xFE |')
+  t.equal(eight_bit_adder.input(x0F, x0F, false), 0x1E,
+         '.             | x0F | x0F | 0 |  0  | 0x1E |')
+  t.equal(eight_bit_adder.input(x0F, x0F, true), 0x1F,
+         '.             | x0F | x0F | 1 |  0  | 0x1F |')
+  t.equal(eight_bit_adder.input(x0F, xFF, true), 0x10F,
+         '.             | x0F | xFF | 1 |  1  | 0x0F |')
+  t.equal(eight_bit_adder.input(xFF, x0F, true), 0x10F,
+          '.            | xFF | x0F | 1 |  1  | 0x0F |')
+  t.equal(eight_bit_adder.input(xFF, xFF, true), 0x1FF,
+          '.            | xFF | xFF | 1 |  1  | 0xFF |')
+  t.end()
+})

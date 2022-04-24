@@ -12,12 +12,13 @@ export interface IAdder {
   output (): number;
 }
 
-export interface IFourBitAdder {
+export interface IBitsAdder {
   a: boolean[];
   b: boolean[];
   ci: boolean;
   s: boolean[];
   co: boolean;
+  bits: number;
   input (a:boolean[], b:boolean[], ci:boolean): number;
   output (): number;
 }
@@ -78,23 +79,23 @@ export class BitAdder implements IAdder {
   }
 }
 
-export class FourBitAdder implements IFourBitAdder {
+export abstract class BitsAdder implements IBitsAdder {
   a: boolean[];
   b: boolean[];
   ci: boolean;
   s: boolean[];
   co: boolean;
   o: number;
-  ba: BitAdder[];
+  bits: number;
 
-  constructor() {
-    this.a = buffer.random_bits(4);
-    this.b = buffer.random_bits(4);
+  constructor(n: number) {
+    this.bits = n;
+    this.a = buffer.random_bits(this.bits);
+    this.b = buffer.random_bits(this.bits);
     this.ci = buffer.random_bit();
-    this.s = buffer.random_bits(4);
+    this.s = buffer.random_bits(this.bits);
     this.co = buffer.random_bit();
-    this.o = buffer.bits_to_num(buffer.random_bits(4));
-    this.ba = new Array(4).fill(0).map(() => { return new BitAdder() });
+    this.o = buffer.bits_to_num(buffer.random_bits(this.bits));
   }
 
   input(a:boolean[], b:boolean[], ci:boolean){
@@ -104,6 +105,23 @@ export class FourBitAdder implements IFourBitAdder {
     this.processing();
 
     return this.output();
+  }
+
+  abstract processing(): void;
+
+  output(){
+    this.o = buffer.bits_to_num(this.s);
+    if(this.co)
+      this.o += 1 << this.bits;
+    return this.o;
+  }
+}
+export class FourBitAdder extends BitsAdder implements IBitsAdder {
+  ba: BitAdder[];
+
+  constructor() {
+    super(4);
+    this.ba = new Array(4).fill(0).map(() => { return new BitAdder() });
   }
 
   processing(){
@@ -116,11 +134,20 @@ export class FourBitAdder implements IFourBitAdder {
     }
     this.co = carry;
   }
+}
 
-  output(){
-    this.o = buffer.bits_to_num(this.s);
-    if(this.co)
-      this.o += 0x10;
-    return this.o;
+export class EightBitAdder extends BitsAdder implements IBitsAdder {
+  ba: FourBitAdder[];
+
+  constructor() {
+    super(8);
+    this.ba = new Array(2).fill(0).map(() => { return new FourBitAdder() });
+  }
+
+  processing(){
+    this.ba[0].input(this.a.slice(4), this.b.slice(4), this.ci);
+    this.ba[1].input(this.a.slice(0,4), this.b.slice(0,4), this.ba[0].co);
+    this.s = this.ba[1].s.concat(this.ba[0].s);
+    this.co = this.ba[1].co;
   }
 }
