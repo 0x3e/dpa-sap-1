@@ -30,8 +30,10 @@ export function random_bits(i: number){
 
 export function bits_to_num(bits: boolean[]){
   let out = 0
-  for (const i in bits)
-    out += (( bits[bits.length - +i - 1] ? 1 : 0) << +i ) // endian
+  for (const i in bits){
+    const ri = bits.length - +i - 1; //endian
+    out += (( bits[ri] ? 1 : 0) << +i )
+  }
 
   return out;
 }

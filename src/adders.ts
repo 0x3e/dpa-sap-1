@@ -105,11 +105,11 @@ export class FourBitAdder implements IFourBitAdder {
 
   processing(){
     let carry = this.ci;
-    for (const ri in this.ba){
-      const i = this.ba.length - +ri - 1; // endian
-      this.ba[i].input(this.a[i], this.b[i], carry)
-      this.s[i] = this.ba[i].s;
-      carry = this.ba[i].co;
+    for (const i in this.ba){
+      const ri = this.ba.length - +i - 1; //endian
+      this.ba[ri].input(this.a[ri], this.b[ri], carry)
+      this.s[ri] = this.ba[ri].s;
+      carry = this.ba[ri].co;
     }
     this.co = carry;
   }
