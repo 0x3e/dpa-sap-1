@@ -110,10 +110,10 @@ export class EightBitRegister implements I8BitRegister {
 
   processing(){
     for (const i in this.r)
-      this.r[i].input(this.l, this.d[i], this.c, this.e)
+      this.r[i].input(this.l, this.d[i], this.c, this.e);
     if(this.clr)
       for (const r of this.r)
-        r.input(true, false, true, false)
+        r.input(true, false, true, false);
     this.o = this.r.map((r) => {return r.output()});
   }
 

@@ -25,14 +25,14 @@ export function random_bit(){
 
 export function random_bits(i: number){
   return new Array(i).fill(undefined).map(() => {
-    return random_bit()})
+    return random_bit()});
 }
 
 export function bits_to_num(bits: boolean[]){
-  let out = 0
+  let out = 0;
   for (const i in bits){
     const ri = bits.length - +i - 1; //endian
-    out += (( bits[ri] ? 1 : 0) << +i )
+    out += (( bits[ri] ? 1 : 0) << +i );
   }
 
   return out;

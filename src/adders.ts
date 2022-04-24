@@ -7,6 +7,7 @@ export interface IAdder {
   ci: boolean;
   s: boolean;
   co: boolean;
+  o: number;
   input (a:boolean, b:boolean, ci:boolean): number;
   output (): number;
 }
@@ -27,6 +28,7 @@ export class BitAdder implements IAdder {
   ci: boolean;
   s: boolean;
   co: boolean;
+  o: number;
   xor0: gate.XOR;
   xor1: gate.XOR;
   and0: gate.AND;
@@ -39,6 +41,7 @@ export class BitAdder implements IAdder {
     this.ci = buffer.random_bit();
     this.s = buffer.random_bit();
     this.co = buffer.random_bit();
+    this.o = buffer.bits_to_num(buffer.random_bits(1));
     this.xor0 = new gate.XOR();
     this.xor1 = new gate.XOR();
     this.and0 = new gate.AND();
@@ -65,13 +68,13 @@ export class BitAdder implements IAdder {
   }
 
   output(){
-    let out = 0;
+    this.o = 0;
     if(this.s)
-      out += 0b01;
+      this.o += 0b01;
     if(this.co)
-      out += 0b10;
+      this.o += 0b10;
 
-    return out;
+    return this.o;
   }
 }
 
@@ -90,7 +93,7 @@ export class FourBitAdder implements IFourBitAdder {
     this.ci = buffer.random_bit();
     this.s = buffer.random_bits(4);
     this.co = buffer.random_bit();
-    this.o = 0;
+    this.o = buffer.bits_to_num(buffer.random_bits(4));
     this.ba = new Array(4).fill(0).map(() => { return new BitAdder() });
   }
 
@@ -107,7 +110,7 @@ export class FourBitAdder implements IFourBitAdder {
     let carry = this.ci;
     for (const i in this.ba){
       const ri = this.ba.length - +i - 1; //endian
-      this.ba[ri].input(this.a[ri], this.b[ri], carry)
+      this.ba[ri].input(this.a[ri], this.b[ri], carry);
       this.s[ri] = this.ba[ri].s;
       carry = this.ba[ri].co;
     }
@@ -115,9 +118,9 @@ export class FourBitAdder implements IFourBitAdder {
   }
 
   output(){
-    let out = buffer.bits_to_num(this.s);
+    this.o = buffer.bits_to_num(this.s);
     if(this.co)
-      out += 0x10;
-    return out;
+      this.o += 0x10;
+    return this.o;
   }
 }
