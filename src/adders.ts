@@ -67,9 +67,9 @@ export class BitAdder implements IAdder {
   output(){
     let out = 0;
     if(this.s)
-      out = out + 0b01;
+      out += 0b01;
     if(this.co)
-      out = out + 0b10;
+      out += 0b10;
 
     return out;
   }
@@ -115,7 +115,9 @@ export class FourBitAdder implements IFourBitAdder {
   }
 
   output(){
-    const out = buffer.bits_to_num(this.s);
+    let out = buffer.bits_to_num(this.s);
+    if(this.co)
+      out += 0x10;
     return out;
   }
 }

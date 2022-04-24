@@ -44,18 +44,18 @@ tap.test('FourBitAdder |  a | b  | c |  co |  s  |', t => {
   t.equal(four_bit_adder.input(x0, x0, false), 0x0,
          '.            | x0 | x0 | 0 |  0  | 0x0 |')
   t.equal(four_bit_adder.input(xF, x0, false), 0xF,
-         '.            | xF | x0 | 0 |  0  | 0x0 |')
-  t.equal(four_bit_adder.input(xF, x1, true), 0x1,
+         '.            | xF | x0 | 0 |  0  | 0xF |')
+  t.equal(four_bit_adder.input(xF, x1, true), 0x11,
          '.            | xF | x1 | 1 |  1  | 0x1 |')
-  t.equal(four_bit_adder.input(xF, xF, true), 0xF,
+  t.equal(four_bit_adder.input(xF, xF, true), 0x1F,
          '.            | xF | xF | 1 |  1  | 0xF |')
   t.equal(four_bit_adder.input(x5, x7, false), 0xC,
          '.            | x5 | x7 | 0 |  0  | 0xC |')
   t.equal(four_bit_adder.input(x5, x7, true), 0xD,
          '.            | x5 | x7 | 1 |  0  | 0xD |')
-  t.equal(four_bit_adder.input(xE, xF, true), 0xE,
+  t.equal(four_bit_adder.input(xE, xF, true), 0x1E,
           '.           | xE | xF | 1 |  1  | 0xE |')
-  t.equal(four_bit_adder.input(xE, xF, false), 0xD,
-          '.           | xE | xF | 1 |  0  | 0xD |')
+  t.equal(four_bit_adder.input(xE, xF, false), 0x1D,
+          '.           | xE | xF | 1 |  1  | 0xD |')
   t.end()
 })
