@@ -113,6 +113,7 @@ export abstract class BitsAdder implements IBitsAdder {
     this.o = buffer.bits_to_num(this.s);
     if(this.co)
       this.o += 1 << this.bits;
+
     return this.o;
   }
 }

@@ -3,6 +3,19 @@ const buffer = require('../dist/buffers')
 const gate = require('../dist/gates')
 const adder = require('../dist/adders')
 
+  xZ = [undefined, undefined, undefined, undefined]
+  x0 = [false, false, false, false]
+  x1 = [false, false, false, true]
+  x5 = [false, true, false, true]
+  x7 = [false, true, true, true]
+  xE = [true, true, true, false]
+  xF = [true, true, true, true]
+
+  xZZ = xZ.concat(xZ)
+  x00 = x0.concat(x0)
+  xFF = xF.concat(xF)
+  x0F = x0.concat(xF);
+
 tap.test('Adder  | a | b | c |  co |  s  |', t => {
   var bit_adder = new adder.BitAdder()
   const first_run = bit_adder.output()
@@ -24,15 +37,9 @@ tap.test('Adder  | a | b | c |  co |  s  |', t => {
          '.      | 1 | 1 | 1 |  1  |  1  |')
   t.end()
 })
+
 tap.test('FourBitAdder |  a | b  | c |  co |  s  |', t => {
   var four_bit_adder = new adder.FourBitAdder()
-  xZ = [undefined, undefined, undefined, undefined]
-  x0 = [false, false, false, false]
-  x1 = [false, false, false, true]
-  x5 = [false, true, false, true]
-  x7 = [false, true, true, true]
-  xE = [true, true, true, false]
-  xF = [true, true, true, true]
 //  input(a:boolean[], b:boolean[], ci:boolean){
   const first_run = four_bit_adder.output()
   t.equal(typeof(first_run), 'number',
@@ -59,12 +66,9 @@ tap.test('FourBitAdder |  a | b  | c |  co |  s  |', t => {
           '.           | xE | xF | 1 |  1  | 0xD |')
   t.end()
 })
+
 tap.test('EightBitAdder |  a  |  b  | c |  co |  s   |', t => {
   var eight_bit_adder = new adder.EightBitAdder()
-  xZZ = new Array(8).fill(undefined);
-  x00 = new Array(8).fill(false);
-  xFF = new Array(8).fill(true);
-  x0F = new Array(4).fill(false).concat(new Array(4).fill(true));
   const first_run = eight_bit_adder.output()
   t.equal(typeof(first_run), 'number',
          '.             |  ?? |  ?? | ? | 0,1 | 0,1  |')

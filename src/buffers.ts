@@ -38,6 +38,10 @@ export function bits_to_num(bits: boolean[]){
   return out;
 }
 
+export function is_bits(bits: (boolean | undefined)[]): bits is boolean[]{
+  return bits.every(i => typeof i === "boolean")
+}
+
 export function throw_on_NaB(...args: boolean[]){
   for (const arg of Array.from(args))
     if(typeof(arg) !== 'boolean')

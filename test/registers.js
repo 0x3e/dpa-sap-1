@@ -3,6 +3,7 @@ const buffer = require('../dist/buffers')
 const gate = require('../dist/gates')
 const flipflop = require('../dist/flipflops')
 const register = require('../dist/registers')
+
 tap.test('Register  | l | d | c | e | Out |', t => {
   //input( l:boolean, d:boolean, c:boolean, e:boolean ){
   var r = new register.Register()

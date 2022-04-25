@@ -4,7 +4,7 @@ import * as flipflop from './flipflops';
 
 export interface IRegister {
   l: boolean;
-  d: boolean | undefined;
+  d: boolean;
   c: boolean;
   e: boolean;
   o: boolean | undefined;
@@ -21,7 +21,7 @@ export interface I8BitRegister {
 
 export class Register implements IRegister {
   l: boolean;
-  d: boolean | undefined;
+  d: boolean;
   c: boolean;
   e: boolean;
   o: boolean | undefined;
@@ -47,15 +47,12 @@ export class Register implements IRegister {
   }
 
   input(l:boolean, d:boolean | undefined, c:boolean, e:boolean){
-/* why istanbul? why is this not tested? is this a bug? */
-/* istanbul ignore next */
-    if(this.d === undefined){
-      this.o = undefined;
-      return this.output();
-    }
-    buffer.throw_on_NaB(l, c, e);
+    if(typeof d === 'undefined')
+      this.d = buffer.random_bit();
+    else
+      this.d = d;
+    buffer.throw_on_NaB(l, this.d, c, e);
     this.l = l;
-    this.d = d;
     this.c = c;
     this.e = e;
     this.processing();
@@ -63,8 +60,6 @@ export class Register implements IRegister {
   }
 
   processing(){
-    if(this.d === undefined)
-      return this.o = undefined;
     const step1 = this.not.input(this.l);
     const step2 = this.and0.input(step1,this.d_latch.q);
     const step3 = this.and1.input(this.d,this.l);
@@ -93,7 +88,7 @@ export class EightBitRegister implements I8BitRegister {
     this.l = buffer.random_bit();
     this.e = buffer.random_bit();
     this.c = buffer.random_bit();
-    this.r = Array(8).fill(0).map(() => { return new Register() });
+    this.r = new Array(8).fill(0).map(() => { return new Register() });
     this.o = this.r.map((r) => {return r.output()});
   }
 
