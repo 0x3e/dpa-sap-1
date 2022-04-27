@@ -1,6 +1,8 @@
+import * as h from './helpers';
 import * as buffer from './buffers';
 import * as gate from './gates';
 import * as flipflop from './flipflops';
+import * as bus from './busses';
 
 export interface IRegister {
   l: boolean;
@@ -15,7 +17,7 @@ export interface IRegister {
 export interface I8BitRegister {
   d: (boolean | undefined)[];
   o: (boolean | undefined)[];
-  input ( l:boolean, d:(boolean | undefined)[], c:boolean, e:boolean, clr:boolean ): (boolean | undefined)[];
+  input ( l:boolean, d:(boolean | undefined)[], c:boolean, e:boolean ): (boolean | undefined)[];
   output (): (boolean | undefined)[];
 }
 
@@ -33,11 +35,11 @@ export class Register implements IRegister {
   tristate: buffer.TriState;
 
   constructor() {
-    this.l = buffer.random_bit();
-    this.d = buffer.random_bit();
-    this.c = buffer.random_bit();
-    this.e = buffer.random_bit();
-    this.o = buffer.random_bit();
+    this.l = h.random_bit();
+    this.d = h.random_bit();
+    this.c = h.random_bit();
+    this.e = h.random_bit();
+    this.o = h.random_bit();
     this.not = new buffer.NOT();
     this.and0 = new gate.AND();
     this.and1 = new gate.AND();
@@ -48,10 +50,10 @@ export class Register implements IRegister {
 
   input(l:boolean, d:boolean | undefined, c:boolean, e:boolean){
     if(typeof d === 'undefined')
-      this.d = buffer.random_bit();
+      this.d = h.random_bit();
     else
       this.d = d;
-    buffer.throw_on_NaB(l, this.d, c, e);
+    h.throw_on_NaB(l, this.d, c, e);
     this.l = l;
     this.c = c;
     this.e = e;
@@ -73,9 +75,8 @@ export class Register implements IRegister {
   }
 }
 
-export class EightBitRegister implements I8BitRegister {
+export class EightBitRegister implements I8BitRegister, bus.IBussable {
   d: (boolean | undefined)[];
-  clr: boolean;
   l: boolean;
   e: boolean;
   c: boolean;
@@ -83,36 +84,46 @@ export class EightBitRegister implements I8BitRegister {
   r: Register[];
 
   constructor() {
-    this.d = buffer.random_bits(8);
-    this.clr = buffer.random_bit();
-    this.l = buffer.random_bit();
-    this.e = buffer.random_bit();
-    this.c = buffer.random_bit();
+    this.d = h.random_bits(8);
+    this.l = h.random_bit();
+    this.e = h.random_bit();
+    this.c = h.random_bit();
     this.r = new Array(8).fill(0).map(() => { return new Register() });
     this.o = this.r.map((r) => {return r.output()});
   }
 
-  input(l:boolean, d:(boolean | undefined)[], c:boolean, e:boolean, clr:boolean ){
-    this.d = d;
-    this.clr = clr;
+  input(l:boolean, d:(boolean | undefined)[], c:boolean, e:boolean ){
     this.l = l;
     this.e = e;
     this.c = c;
+
+    if(this.l)
+      this.d = d;
 
     this.processing();
     return this.output();
   }
 
+  bus(d:(boolean | undefined)[]){
+    if(this.l)
+      this.d = d;
+
+    this.processing();
+
+    return this.output();
+  }
+
   processing(){
     for (const i in this.r)
-      this.r[i].input(this.l, this.d[i], this.c, this.e);
-    if(this.clr)
-      for (const r of this.r)
-        r.input(true, false, true, false);
+      this.r[i].input(true, this.d[i], this.c, true);
+
     this.o = this.r.map((r) => {return r.output()});
   }
 
   output(){
+    if(!this.e)
+      return new Array(8).fill(undefined);
+
     return this.o;
   }
 }

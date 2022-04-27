@@ -1,4 +1,4 @@
-import * as buffer from './buffers';
+import * as h from './helpers';
 
 export interface IBussable {
   bus ( d:(boolean | undefined)[] ): (boolean | undefined)[];
@@ -14,7 +14,7 @@ export class Bus implements IBus{
   member_name: string[];
   member: IBussable[];
   constructor() {
-    this.d = buffer.random_bits(8);
+    this.d = h.random_bits(8);
     this.member_name = [];
     this.member = [];
   }

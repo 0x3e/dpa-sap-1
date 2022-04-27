@@ -1,21 +1,23 @@
 const tap = require('tap')
+const h = require('../dist/helpers')
 const buffer = require('../dist/buffers')
 const gate = require('../dist/gates')
 const flipflop = require('../dist/flipflops')
 const register = require('../dist/registers')
 const adder = require('../dist/adders')
 const ram = require('../dist/rams')
+const bus = require('../dist/busses')
 
-  xZ = [undefined, undefined, undefined, undefined]
-  x0 = [false, false, false, false]
-  x1 = [false, false, false, true]
-  x5 = [false, true, false, true]
-  x7 = [false, true, true, true]
-  xE = [true, true, true, false]
-  xF = [true, true, true, true] 
+xZ = [undefined, undefined, undefined, undefined]
+x0 = [false, false, false, false]
+x1 = [false, false, false, true]
+x5 = [false, true, false, true]
+x7 = [false, true, true, true]
+xE = [true, true, true, false]
+xF = [true, true, true, true] 
 
-  xZZ = xZ.concat(xZ)
-  x00 = x0.concat(x0)
-  x01 = x0.concat(x1)
-  xFF = xF.concat(xF)
-  x0F = x0.concat(xF)
+xZZ = xZ.concat(xZ)
+x00 = x0.concat(x0)
+x01 = x0.concat(x1)
+xFF = xF.concat(xF)
+x0F = x0.concat(xF)

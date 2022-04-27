@@ -1,3 +1,4 @@
+import * as h from './helpers';
 import * as buffer from './buffers';
 export interface TwoInput {
   i0: boolean;
@@ -13,12 +14,12 @@ export class AND implements TwoInput {
   i1: boolean;
   o: boolean;
   constructor() {
-    this.i0 = buffer.random_bit();
-    this.i1 = buffer.random_bit();
-    this.o  = buffer.random_bit();
+    this.i0 = h.random_bit();
+    this.i1 = h.random_bit();
+    this.o  = h.random_bit();
   }
   input(i0: boolean, i1: boolean) {
-    buffer.throw_on_NaB(i0, i1);
+    h.throw_on_NaB(i0, i1);
     this.i0 = i0;
     this.i1 = i1;
     this.processing();

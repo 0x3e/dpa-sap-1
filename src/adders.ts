@@ -1,5 +1,7 @@
-import * as buffer from './buffers';
+import * as h from './helpers';
 import * as gate from './gates';
+import * as register from './registers';
+import * as bus from './busses';
 
 export interface IAdder {
   a: boolean;
@@ -37,12 +39,12 @@ export class BitAdder implements IAdder {
   or: gate.OR;
 
   constructor() {
-    this.a = buffer.random_bit();
-    this.b = buffer.random_bit();
-    this.ci = buffer.random_bit();
-    this.s = buffer.random_bit();
-    this.co = buffer.random_bit();
-    this.o = buffer.bits_to_num(buffer.random_bits(1));
+    this.a = h.random_bit();
+    this.b = h.random_bit();
+    this.ci = h.random_bit();
+    this.s = h.random_bit();
+    this.co = h.random_bit();
+    this.o = h.bits_to_num(h.random_bits(1));
     this.xor0 = new gate.XOR();
     this.xor1 = new gate.XOR();
     this.and0 = new gate.AND();
@@ -51,7 +53,7 @@ export class BitAdder implements IAdder {
   }
 
   input(a:boolean, b:boolean, ci:boolean){
-    buffer.throw_on_NaB(a, b, ci);
+    h.throw_on_NaB(a, b, ci);
     this.a = a;
     this.b = b;
     this.ci = ci;
@@ -90,12 +92,12 @@ export abstract class BitsAdder implements IBitsAdder {
 
   constructor(n: number) {
     this.bits = n;
-    this.a = buffer.random_bits(this.bits);
-    this.b = buffer.random_bits(this.bits);
-    this.ci = buffer.random_bit();
-    this.s = buffer.random_bits(this.bits);
-    this.co = buffer.random_bit();
-    this.o = buffer.bits_to_num(buffer.random_bits(this.bits));
+    this.a = h.random_bits(this.bits);
+    this.b = h.random_bits(this.bits);
+    this.ci = h.random_bit();
+    this.s = h.random_bits(this.bits);
+    this.co = h.random_bit();
+    this.o = h.bits_to_num(h.random_bits(this.bits));
   }
 
   input(a:boolean[], b:boolean[], ci:boolean){
@@ -110,7 +112,7 @@ export abstract class BitsAdder implements IBitsAdder {
   abstract processing(): void;
 
   output(){
-    this.o = buffer.bits_to_num(this.s);
+    this.o = h.bits_to_num(this.s);
     if(this.co)
       this.o += 1 << this.bits;
 
@@ -137,12 +139,24 @@ export class FourBitAdder extends BitsAdder implements IBitsAdder {
   }
 }
 
-export class EightBitAdder extends BitsAdder implements IBitsAdder {
+export class EightBitAdder extends BitsAdder implements IBitsAdder, bus.IBussable {
+  e: boolean;
   ba: FourBitAdder[];
+  r: register.EightBitRegister[];
 
   constructor() {
     super(8);
+    this.ci = false;
+    this.e = false;
     this.ba = new Array(2).fill(0).map(() => { return new FourBitAdder() });
+    this.r = [];
+  }
+  a_register(a: register.EightBitRegister){
+    this.r[0]=a;
+  }
+
+  b_register(b: register.EightBitRegister){
+    this.r[1]=b;
   }
 
   processing(){
@@ -150,5 +164,21 @@ export class EightBitAdder extends BitsAdder implements IBitsAdder {
     this.ba[1].input(this.a.slice(0,4), this.b.slice(0,4), this.ba[0].co);
     this.s = this.ba[1].s.concat(this.ba[0].s);
     this.co = this.ba[1].co;
+  }
+
+  bus(){
+    this.ci = false;
+    const a = this.r[0].o;
+    const b = this.r[1].o;
+    if(h.is_bits(a))
+      this.a = a;
+    if(h.is_bits(b))
+      this.b = b;
+
+    this.processing();
+
+    if(!this.e)
+      return new Array(8).fill(undefined);
+    return this.s;
   }
 }

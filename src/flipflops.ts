@@ -1,3 +1,4 @@
+import * as h from './helpers';
 import * as buffer from './buffers';
 import * as gate from './gates';
 export interface ISRLatch {
@@ -28,17 +29,17 @@ export class SRLatch implements ISRLatch {
   nor0: gate.NOR;
   nor1: gate.NOR;
   constructor() {
-    this.s = buffer.random_bit();
-    this.r = buffer.random_bit();
-    this.q = buffer.random_bit();
-    this.not_q = buffer.random_bit();
+    this.s = h.random_bit();
+    this.r = h.random_bit();
+    this.q = h.random_bit();
+    this.not_q = h.random_bit();
     this.nor0 = new gate.NOR();
     this.nor1 = new gate.NOR();
     this.processing();
     this.output();
   }
   input(s: boolean, r: boolean) {
-    buffer.throw_on_NaB(s, r);
+    h.throw_on_NaB(s, r);
     this.s = s;
     this.r = r;
     this.processing();
@@ -52,7 +53,7 @@ export class SRLatch implements ISRLatch {
     this.not_q = this.nor1.output();
   }
   output(){
-    const out = buffer.bits_to_num([this.not_q,this.q]);
+    const out = h.bits_to_num([this.not_q,this.q]);
     return out;
   }
 }
@@ -67,10 +68,10 @@ export class DLatch implements IDLatch {
   and1: gate.AND;
   sr_latch: SRLatch;
   constructor() {
-    this.e = buffer.random_bit();
-    this.d = buffer.random_bit();
-    this.q = buffer.random_bit();
-    this.not_q = buffer.random_bit();
+    this.e = h.random_bit();
+    this.d = h.random_bit();
+    this.q = h.random_bit();
+    this.not_q = h.random_bit();
     this.not = new buffer.NOT();
     this.and0 = new gate.AND();
     this.and1 = new gate.AND();
@@ -79,7 +80,7 @@ export class DLatch implements IDLatch {
     this.output();
   }
   input(e: boolean, d: boolean) {
-    buffer.throw_on_NaB(e, d);
+    h.throw_on_NaB(e, d);
     this.e = e;
     this.d = d;
     this.processing();
