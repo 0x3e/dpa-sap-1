@@ -170,8 +170,10 @@ export class EightBitAdder extends BitsAdder implements IBitsAdder, bus.IBussabl
     this.ci = false;
     const a = this.r[0].o;
     const b = this.r[1].o;
+/* istanbul ignore next */
     if(h.is_bits(a))
       this.a = a;
+/* istanbul ignore next */
     if(h.is_bits(b))
       this.b = b;
 
