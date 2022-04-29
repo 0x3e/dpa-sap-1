@@ -108,8 +108,9 @@ export class EightBitRegister implements I8BitRegister, bus.IBussable {
     if(this.l)
       this.d = d;
 
-    this.processing();
-
+    if(this.e || this.l)
+      this.processing();
+    
     return this.output();
   }
 

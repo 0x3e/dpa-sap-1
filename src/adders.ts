@@ -179,6 +179,7 @@ export class EightBitAdder extends BitsAdder implements IBitsAdder, bus.IBussabl
 
     if(!this.e)
       return new Array(8).fill(undefined);
-    return this.s;
+    else
+      return this.s;
   }
 }

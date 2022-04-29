@@ -1,4 +1,5 @@
 const tap = require('tap')
+const h = require('../dist/helpers')
 const buffer = require('../dist/buffers')
 const gate = require('../dist/gates')
 const flipflop = require('../dist/flipflops')
@@ -37,5 +38,28 @@ tap.test('SixteenByEightBitRAM    | addr |  d  | l | e | c |  o  |', t => {
          '.                       | x1 | xFF | 1 |  0  | 1 | 0xZZ |')
   t.same(the_ram.input(x0F, xZZ, false, true, true), x00,
          '.                       | x1 | xFF | 0 |  1  | 1 | 0x00 |')
+  t.end()
+})
+tap.test('SixteenByEightBitRAM by control', t => {
+  var the_ram = new ram.SixteenByEightBitRAM()
+  the_ram.l = true
+  the_ram.c = true
+  the_ram.e = false
+  for(i=0;i<0x10;i+=1){
+    the_ram.addr = h.num_to_bits(i,4)
+    the_ram.bus(h.num_to_bits(0,8))
+  }
+  the_ram.addr = xF
+  the_ram.bus(x0F)
+  the_ram.addr = xE
+  the_ram.bus(x01)
+  the_ram.addr = xF
+  the_ram.l = false
+  the_ram.e = true
+  t.same(the_ram.bus(xZZ),x0F, "unbus xF")
+  the_ram.addr = xE
+  the_ram.l = false
+  the_ram.e = true
+  t.same(the_ram.bus(xZZ),x01, "unbus xE")
   t.end()
 })

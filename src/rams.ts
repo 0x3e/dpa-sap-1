@@ -48,6 +48,7 @@ export class SixteenByEightBitRAM implements IRAMs, bus.IBussable {
   }
   processing(){
     this.o = new Array(8).fill(undefined);
+    this.addr = this.addr.slice(0,4);
     if(!h.is_bits(this.addr))
       return;
     const addr_num = h.bits_to_num(this.addr.slice(0,4));
@@ -61,7 +62,7 @@ export class SixteenByEightBitRAM implements IRAMs, bus.IBussable {
     if(this.l)
       this.d = d;
 
-    this.processing
+    this.processing();
 
     if(this.e)
       return this.output();
